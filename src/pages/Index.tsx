@@ -16,13 +16,34 @@ const Index = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [hfToken, setHfToken] = useState<string>(() => {
+    return localStorage.getItem('hf_token') || '';
+  });
   const { toast } = useToast();
+
+  const saveHfToken = (token: string) => {
+    localStorage.setItem('hf_token', token);
+    setHfToken(token);
+    toast({
+      title: "Token Saved",
+      description: "Your Hugging Face token has been saved",
+    });
+  };
 
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) {
       toast({
         title: "Error",
         description: "Please enter a message",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!hfToken) {
+      toast({
+        title: "Token Required",
+        description: "Please enter your Hugging Face token first",
         variant: "destructive"
       });
       return;
@@ -38,19 +59,40 @@ const Index = () => {
       
       setMessages(newMessages);
 
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Make API call to Hugging Face Inference API
+      const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${hfToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          inputs: formatPrompt(newMessages),
+          parameters: {
+            max_new_tokens: 1024,
+            temperature: 0.7,
+            top_p: 0.95,
+            return_full_text: false,
+          }
+        }),
+      });
 
+      if (!response.ok) {
+        throw new Error(`API call failed with status: ${response.status}`);
+      }
+
+      const result = await response.json();
       const assistantMessage: Message = {
         role: 'assistant',
-        content: "I am a hardcoded response. The database connection has been removed for testing purposes. You can modify this response in the Index.tsx file."
+        content: result[0]?.generated_text || "I couldn't generate a response. Please try again."
       };
 
       setMessages([...newMessages, assistantMessage]);
     } catch (error: any) {
+      console.error("Error calling Hugging Face API:", error);
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to get a response from the AI model",
         variant: "destructive"
       });
     } finally {
@@ -58,12 +100,24 @@ const Index = () => {
     }
   };
 
+  // Format messages for the Mistral model
+  const formatPrompt = (messages: Message[]) => {
+    return messages.map(msg => {
+      if (msg.role === 'user') {
+        return `<s>[INST] ${msg.content} [/INST]`;
+      } else {
+        return msg.content;
+      }
+    }).join("\n");
+  };
+
   return (
     <div className="flex h-screen">
       <Sidebar 
         isOpen={isSidebarOpen} 
         onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-        onApiKeyChange={() => {}} // Empty function since we don't need API key anymore
+        onApiKeyChange={saveHfToken}
+        apiKey={hfToken}
       />
       
       <main className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'} dark:bg-chatgpt-main light:bg-gray-100`}>
@@ -74,6 +128,11 @@ const Index = () => {
             <div className="w-full max-w-3xl px-4 space-y-4">
               <div>
                 <h1 className="mb-8 text-4xl font-semibold text-center dark:text-white light:text-gray-900">What can I help with?</h1>
+                {!hfToken && (
+                  <div className="mb-4 p-4 bg-yellow-100 text-yellow-800 rounded-md">
+                    <p className="font-medium">Please enter your Hugging Face token in the sidebar to start chatting.</p>
+                  </div>
+                )}
                 <ChatInput onSend={handleSendMessage} isLoading={isLoading} />
               </div>
               <ActionButtons />
