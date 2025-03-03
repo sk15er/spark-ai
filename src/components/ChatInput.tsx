@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { ArrowUp, Loader2 } from "lucide-react";
 
@@ -31,20 +32,20 @@ const ChatInput = ({ onSend, isLoading = false }: ChatInputProps) => {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Message Claude"
-          className="w-full resize-none rounded-full bg-[#2F2F2F] px-4 py-4 pr-12 focus:outline-none"
+          placeholder="Message Spark-AI"
+          className="w-full resize-none rounded-full bg-[#2F2F2F] px-4 py-4 pr-12 focus:outline-none dark:bg-[#3F3F3F]"
           style={{ maxHeight: "200px" }}
           disabled={isLoading}
         />
         <button 
           onClick={handleSubmit}
           disabled={isLoading || !message.trim()}
-          className="absolute right-3 top-[50%] -translate-y-[50%] p-1.5 bg-white rounded-full hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="absolute right-3 top-[50%] -translate-y-[50%] p-1.5 bg-white rounded-full hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
         >
           {isLoading ? (
-            <Loader2 className="h-4 w-4 text-black animate-spin" />
+            <Loader2 className="h-4 w-4 text-black dark:text-white animate-spin" />
           ) : (
-            <ArrowUp className="h-4 w-4 text-black" />
+            <ArrowUp className="h-4 w-4 text-black dark:text-white" />
           )}
         </button>
       </div>

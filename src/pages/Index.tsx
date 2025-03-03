@@ -66,14 +66,14 @@ const Index = () => {
         onApiKeyChange={() => {}} // Empty function since we don't need API key anymore
       />
       
-      <main className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'}`}>
+      <main className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'} dark:bg-chatgpt-main light:bg-gray-100`}>
         <ChatHeader isSidebarOpen={isSidebarOpen} />
         
         <div className={`flex h-full flex-col ${messages.length === 0 ? 'items-center justify-center' : 'justify-between'} pt-[60px] pb-4`}>
           {messages.length === 0 ? (
             <div className="w-full max-w-3xl px-4 space-y-4">
               <div>
-                <h1 className="mb-8 text-4xl font-semibold text-center">What can I help with?</h1>
+                <h1 className="mb-8 text-4xl font-semibold text-center dark:text-white light:text-gray-900">What can I help with?</h1>
                 <ChatInput onSend={handleSendMessage} isLoading={isLoading} />
               </div>
               <ActionButtons />

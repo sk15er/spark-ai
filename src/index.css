@@ -1,9 +1,31 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --background-dark: #212121;
+  --background-light: #f5f5f5;
+  --text-dark: #ffffff;
+  --text-light: #333333;
+}
+
+.dark {
+  --background: var(--background-dark);
+  --text: var(--text-dark);
+}
+
+.light {
+  --background: var(--background-light);
+  --text: var(--text-light);
+}
+
 body {
-  @apply bg-chatgpt-main text-white;
+  @apply bg-chatgpt-main text-white transition-colors duration-300;
+}
+
+.light body {
+  @apply bg-gray-100 text-gray-900;
 }
 
 .sidebar-item {
@@ -12,4 +34,23 @@ body {
 
 .action-button {
   @apply flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-chatgpt-hover/50 border border-transparent hover:border-chatgpt-border transition-all duration-200;
+}
+
+.light .action-button {
+  @apply hover:bg-gray-200/50 hover:border-gray-300;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
 }
