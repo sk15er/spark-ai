@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import Sidebar from '@/components/Sidebar';
 import ChatHeader from '@/components/ChatHeader';
@@ -13,13 +13,24 @@ type Message = {
 };
 
 const Index = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Set sidebar to open by default
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hfToken, setHfToken] = useState<string>(() => {
-    return localStorage.getItem('hf_token') || '';
+    return localStorage.getItem('hf_token') || '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'; // Added your token here
   });
   const { toast } = useToast();
+
+  // Save token to localStorage on component mount
+  useEffect(() => {
+    if (hfToken && !localStorage.getItem('hf_token')) {
+      localStorage.setItem('hf_token', hfToken);
+      toast({
+        title: "Token Saved",
+        description: "Your Hugging Face token has been saved automatically",
+      });
+    }
+  }, [hfToken, toast]);
 
   const saveHfToken = (token: string) => {
     localStorage.setItem('hf_token', token);
@@ -128,11 +139,6 @@ const Index = () => {
             <div className="w-full max-w-3xl px-4 space-y-4">
               <div>
                 <h1 className="mb-8 text-4xl font-semibold text-center dark:text-white light:text-gray-900">What can I help with?</h1>
-                {!hfToken && (
-                  <div className="mb-4 p-4 bg-yellow-100 text-yellow-800 rounded-md">
-                    <p className="font-medium">Please enter your Hugging Face token in the sidebar to start chatting.</p>
-                  </div>
-                )}
                 <ChatInput onSend={handleSendMessage} isLoading={isLoading} />
               </div>
               <ActionButtons />
