@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import Sidebar from '@/components/Sidebar';
@@ -13,15 +12,14 @@ type Message = {
 };
 
 const Index = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Set sidebar to open by default
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hfToken, setHfToken] = useState<string>(() => {
-    return localStorage.getItem('hf_token') || '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'; // Added your token here
+    return localStorage.getItem('hf_token') || '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';
   });
   const { toast } = useToast();
 
-  // Save token to localStorage on component mount
   useEffect(() => {
     if (hfToken && !localStorage.getItem('hf_token')) {
       localStorage.setItem('hf_token', hfToken);
@@ -70,7 +68,6 @@ const Index = () => {
       
       setMessages(newMessages);
 
-      // Make API call to Hugging Face Inference API
       const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
         method: 'POST',
         headers: {
@@ -111,7 +108,6 @@ const Index = () => {
     }
   };
 
-  // Format messages for the Mistral model
   const formatPrompt = (messages: Message[]) => {
     return messages.map(msg => {
       if (msg.role === 'user') {
@@ -149,8 +145,21 @@ const Index = () => {
               <div className="w-full max-w-3xl mx-auto px-4 py-2">
                 <ChatInput onSend={handleSendMessage} isLoading={isLoading} />
               </div>
-              <div className="text-xs text-center text-gray-500 py-2">
-                Spark-AI can make mistakes. Check important info.
+              <div className="flex flex-col items-center text-gray-500 py-2 space-y-1">
+                <div className="text-xs">
+                  Spark-AI can make mistakes. Check important info.
+                </div>
+                <div className="text-xs font-medium">
+                  Spark-AI is made by Shushank and Mayank
+                </div>
+                <div className="text-xs flex space-x-3">
+                  <a href="https://github.com/sk16er" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">
+                    github.com/sk16er
+                  </a>
+                  <a href="mailto:cxmayank9306@gmail.com" className="hover:text-blue-500 transition-colors">
+                    cxmayank9306@gmail.com
+                  </a>
+                </div>
               </div>
             </>
           )}
